@@ -62,6 +62,14 @@ class Library{
             }
             
         });
+        //make editItem button functional
+        editItem.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               editBook();
+            }
+            
+        });
         
         buttonsPanel.add(editItem);
         buttonsPanel.add(deleteItem);
@@ -134,7 +142,7 @@ class Library{
                     try
                     {
                         x=Integer.parseInt(enteredyear);
-                        if(x>1 && x<2024)
+                        if(x>0 && x<2024)
                         {
                         m1.addRow(new Object[]{enteredtitle,enteredauthor,enteredyear,"Read Item"});
                         try {
@@ -164,6 +172,256 @@ class Library{
         });
         //set visibility of the dialog box
         addBookDialog.setVisible(true);
+    }
+    int count=0;
+    //edit book function
+    private void editBook()
+    {
+        //separate gui screen
+        JDialog editBookDialog=new JDialog(); 
+        //title of gui screen
+        editBookDialog.setTitle("Edit Book");
+        //set size of dialog box
+        editBookDialog.setSize(550,100);
+        //setting the layout as grid layout
+        editBookDialog.setLayout(new GridLayout(2,2));
+        //make text boxes/fields
+        JTextField title=new JTextField();
+        //add the delete book button
+        JButton editButton=new JButton("Edit Book");
+        editBookDialog.add(new JLabel("Enter the title of the book you want to edit: "));
+        editBookDialog.add(title);
+        //first add empty cell 
+        editBookDialog.add(new JLabel(""));
+        editBookDialog.add(editButton);
+        //make editbutton functional
+        editButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              String EnteredTitle=title.getText();
+              for (;count<m1.getRowCount();count++)
+                {
+                   String name=(String)m1.getValueAt(count, 0);
+                   //if book is in table
+                   if(name.equals(EnteredTitle))
+                   {
+                       //create new dialog box for editing
+                       //separate gui screen
+                        JDialog editBookDialog2=new JDialog(); 
+                        //title of gui screen
+                        editBookDialog2.setTitle("Editing the Book");
+                        //set size of dialog box
+                        editBookDialog2.setSize(550,200);
+                        //setting the layout as grid layout
+                        editBookDialog2.setLayout(new GridLayout(5,2));
+                        //edit title label
+                        editBookDialog2.add(new JLabel("Click to edit title of the book: "));
+                        //add the title editing book button
+                        JButton titleEdit=new JButton("Edit title");
+                        editBookDialog2.add(titleEdit);
+                        //add actionListener of edit title 
+                        titleEdit.addActionListener(new ActionListener(){
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                     //separate gui screen
+                                    JDialog editBookNameDialog=new JDialog(); 
+                                    //title of gui screen
+                                    editBookNameDialog.setTitle("Edit Book Name");
+                                    //set size of dialog box
+                                    editBookNameDialog.setSize(550,100);
+                                    //setting the layout as grid layout
+                                    editBookNameDialog.setLayout(new GridLayout(2,2));
+                                    //make text boxes/fields
+                                    JTextField title=new JTextField();
+                                    //add the delete book button
+                                    JButton editButton=new JButton("Done");
+                                    editBookNameDialog.add(new JLabel("Enter new title: "));
+                                    editBookNameDialog.add(title);
+                                    //first add empty cell 
+                                    editBookNameDialog.add(new JLabel(""));
+                                    editBookNameDialog.add(editButton);
+                                    editButton.addActionListener(new ActionListener(){
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                             final String T=title.getText();
+                                             if(!T.isEmpty()){
+                                             m1.setValueAt(T, count, 0);
+                                             showEditSuccessMessage();
+                                             editBookNameDialog.dispose();
+                                             }
+                                        }
+                                    });
+                                    //make visible
+                                    editBookNameDialog.setVisible(true);
+                            }
+                       
+                        });
+                        //edit author label
+                        editBookDialog2.add(new JLabel("Click to edit author name of the book: "));
+                        //add the author editing book button
+                        JButton authorEdit=new JButton("Edit Author");
+                        editBookDialog2.add(authorEdit);
+                        //add actionListener of edit title 
+                        authorEdit.addActionListener(new ActionListener(){
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                     //separate gui screen
+                                    JDialog editAuthorNameDialog=new JDialog(); 
+                                    //title of gui screen
+                                    editAuthorNameDialog.setTitle("Edit Author Name");
+                                    //set size of dialog box
+                                    editAuthorNameDialog.setSize(550,100);
+                                    //setting the layout as grid layout
+                                    editAuthorNameDialog.setLayout(new GridLayout(2,2));
+                                    //make text boxes/fields
+                                    JTextField author=new JTextField();
+                                    //add the delete book button
+                                    JButton editAuthorButton=new JButton("Done");
+                                    editAuthorNameDialog.add(new JLabel("Enter new author name: "));
+                                    editAuthorNameDialog.add(author);
+                                    //first add empty cell 
+                                    editAuthorNameDialog.add(new JLabel(""));
+                                    editAuthorNameDialog.add(editAuthorButton);
+                                    editAuthorButton.addActionListener(new ActionListener(){
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                             final String A=author.getText();
+                                             if(!A.isEmpty()){
+                                             m1.setValueAt(A, count, 1);
+                                             showEditSuccessMessage();
+                                             editAuthorNameDialog.dispose();
+                                             }
+                                        }
+                                    });
+                                    //make visible
+                                    editAuthorNameDialog.setVisible(true);
+                            }
+                       
+                        });
+                        //edit year label
+                        editBookDialog2.add(new JLabel("Click to edit year of publication of the book: "));
+                        //add the year editing book button
+                        JButton yearEdit=new JButton("Edit year");
+                        editBookDialog2.add(yearEdit);
+                        
+                        //add actionListener of edit year 
+                        yearEdit.addActionListener(new ActionListener(){
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                     //separate gui screen
+                                    JDialog editYearDialog=new JDialog(); 
+                                    //title of gui screen
+                                    editYearDialog.setTitle("Edit Year Of Publication");
+                                    //set size of dialog box
+                                    editYearDialog.setSize(550,100);
+                                    //setting the layout as grid layout
+                                    editYearDialog.setLayout(new GridLayout(2,2));
+                                    //make text boxes/fields
+                                    JTextField year=new JTextField();
+                                    //add the delete book button
+                                    JButton editYearButton=new JButton("Done");
+                                    editYearDialog.add(new JLabel("Enter new year of publication: "));
+                                    editYearDialog.add(year);
+                                    //first add empty cell 
+                                    editYearDialog.add(new JLabel(""));
+                                    editYearDialog.add(editYearButton);
+                                    editYearButton.addActionListener(new ActionListener(){
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                             final String Y=year.getText();
+                                             if(!Y.isEmpty())
+                                             {
+                                                int num=0;
+                                                try
+                                                {
+                                                    num=Integer.parseInt(Y);
+                                                    if(num>0 && num<2024)
+                                                    {
+                                                        m1.setValueAt(Y, count, 2);
+                                                         showEditSuccessMessage();
+                                                         editYearDialog.dispose();
+                                                    }
+                                                    else
+                                                    {
+                                                       throw new InvalidInputException("Invalid Year Entered");
+                                                    }
+                                                }
+                                                catch(NumberFormatException ex)
+                                                {
+                                                    showErrorMessage();
+
+                                                } catch (InvalidInputException ex) {
+                                                     JOptionPane.showMessageDialog(null, "Invalid Year Entered, Enter Again");
+                                                }
+                                             }
+                                             
+                                        }
+                                    });
+                                    //make visible
+                                    editYearDialog.setVisible(true);
+                            }
+                       
+                        });
+                        //add the add book button
+                        JButton Done=new JButton("Done");
+                        //first add empty cell 
+                        editBookDialog2.add(new JLabel(""));
+                        //first add empty cell 
+                        editBookDialog2.add(new JLabel(""));
+                        //first add empty cell 
+                        editBookDialog2.add(new JLabel(""));
+                        editBookDialog2.add(Done);
+                        //make done button functional
+                        Done.addActionListener(new ActionListener(){
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                 //update the file
+                                try{
+                                    //dont append the data just write the data from the table
+                                    FileWriter fw=new FileWriter("data.txt",false);
+                                    for(int x=0;x<m1.getRowCount();x++)
+                                    {
+                                        for(int y=0;y<m1.getColumnCount();y++)
+                                        {
+                                            if(y!=3)
+                                            {
+                                            //read each cell
+                                            Object entry=m1.getValueAt(x, y);
+                                            if(entry!=null)
+                                            {
+                                                fw.write(entry.toString());
+                                            }
+                                            if(y<m1.getColumnCount()-2)
+                                            {
+                                                fw.write(",");
+                                            }
+                                            }
+
+                                        }
+                                        fw.write("\n");
+                                    }
+                                    fw.close();
+                                }
+                                catch(IOException ex)
+                                {
+                                }
+                                editBookDialog.dispose();
+                                editBookDialog2.dispose();
+                            }
+                            
+                        });
+                        //set visibility
+                        editBookDialog2.setVisible(true);
+                        return;
+                   }
+                }
+                //if book not found
+                showbookNotFoundMessage();
+            }
+        });
+        //set visibility to true
+        editBookDialog.setVisible(true);
+        
     }
     //delete book function
     private void deleteBook()
@@ -229,6 +487,7 @@ class Library{
                         catch(IOException ex)
                         {
                         }
+                        deleteBookDialog.dispose();
                        return;
                    }
                 }
@@ -251,6 +510,10 @@ class Library{
         catch(IOException e)
         {
         }
+    }
+    private void showEditSuccessMessage()
+    {
+        JOptionPane.showMessageDialog(null, "Edited successfully !");
     }
     private void showSuccessMessage()
     {
