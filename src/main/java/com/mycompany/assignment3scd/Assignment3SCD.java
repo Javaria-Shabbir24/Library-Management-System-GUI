@@ -11,11 +11,82 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+class BarChart extends JPanel
+{
+    private Map<String,Integer>data;
+    private int xSpace=20;
+    //constructor
+    public BarChart(Map<String,Integer> data)
+    {
+        this.data=data;
+    }
+    @Override
+    public void paint(Graphics g)
+    {
+        super.paint(g);
+        int x=30+xSpace;
+        int y=300;
+        int barWidth=50;
+        int spacing =40;
+        int maxY=0;
+        //find max count for scaling
+        for(Integer count: data.values())
+        {
+            if(count>maxY)
+            {
+                maxY=count;
+            }
+        }
+         // Draw the x-axis
+        g.setColor(Color.black);
+        g.drawLine(30, y, x + data.size() * (barWidth + spacing), y);
+
+        // Draw the y-axis
+        g.drawLine(30, 50, 30, y);
+        // Draw the y-axis label
+        g.setColor(Color.black);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.rotate(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+        g2d.drawString("Popularity Counts", -((y + 50) / 2), 10); // Position vertically
+        g2d.rotate(Math.PI / 2); // Reset rotation
+
+        // Draw the y-axis values
+        g.setColor(Color.black);
+        for (int i = 0; i <= maxY; i += 10) {
+            int yValue = y - (int) ((double) i / maxY * (y - 50));
+            g.drawString(String.valueOf(i), 10, yValue + 5);
+            g.drawLine(30, yValue, 25, yValue);
+        }
+        //draw the bars and labels
+        g.setColor(Color.blue);
+        for(Map.Entry<String,Integer>entry:data.entrySet())
+        {  
+            int k=x;
+            g.setColor(Color.blue);
+            String label=entry.getKey();
+            int count=entry.getValue();
+            int barHeight=(int) ((double) count / maxY * (y - 50));
+            g.fillRect(x, y-barHeight, barWidth, barHeight);
+            g.setColor(Color.BLACK);
+            //add labels
+            g.drawString(label, x, y+20);
+            
+            // Add the bar height value on top of the bar
+            g.drawString(String.valueOf(count), x, y - barHeight - 20);
+            
+            //set next x coordinate
+            x+=barWidth+spacing;
+        }
+    }
+}
 class Library{
     //creating default table model
     DefaultTableModel m1=new DefaultTableModel();
@@ -37,6 +108,7 @@ class Library{
         JButton addItem=new JButton("Add Item");
         JButton editItem=new JButton("Edit Item");
         JButton deleteItem=new JButton("Delete Item");
+        JButton ViewPopularity=new JButton("View Popularity");
         //add everything to the frame
         frame.add(scrollbar,BorderLayout.CENTER);
         //creating a  panel for buttons in the bottom
@@ -66,9 +138,28 @@ class Library{
             }
             
         });
-        
+        ViewPopularity.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Map<String,Integer> bardata=new HashMap<>();
+                Random random=new Random();
+                for(int i=0;i<m1.getRowCount();i++)
+                {
+                    for(int j=0;j<m1.getColumnCount();j++)
+                    {
+                        if(j==0)
+                        {
+                        //generating random values for popularity count
+                        bardata.put((String)m1.getValueAt(i, j), random.nextInt(20)+1);
+                        }
+                    }
+                }
+                createBarGraph(bardata);
+            }
+        });
         buttonsPanel.add(editItem);
         buttonsPanel.add(deleteItem);
+        buttonsPanel.add(ViewPopularity);
         frame.add(buttonsPanel,BorderLayout.SOUTH);
         //add exit on close for the window
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -121,6 +212,22 @@ class Library{
         });
         //setting visibility equal to true
         frame.setVisible(true);
+    }
+    //create bar graph
+    private void createBarGraph(Map<String,Integer>bardata)
+    {
+        //separate gui screen
+        JDialog addPopoularityCountDialog=new JDialog(); 
+        //title of gui screen
+        addPopoularityCountDialog.setTitle("Bar Graph");
+        //set size of dialog box
+        addPopoularityCountDialog.setSize(700,500);
+        //create JPanel for the bar chart
+        JPanel barchart=new BarChart(bardata);
+        addPopoularityCountDialog.add(barchart);
+        //set visibility
+        addPopoularityCountDialog.setVisible(true);
+
     }
     
     //add book function
@@ -453,7 +560,7 @@ class Library{
         //title of gui screen
         deleteBookDialog.setTitle("Delete Book");
         //set size of dialog box
-        deleteBookDialog.setSize(500,100);
+        deleteBookDialog.setSize(800,700);
         //setting the layout as grid layout
         deleteBookDialog.setLayout(new GridLayout(2,2));
         //make text boxes/fields
