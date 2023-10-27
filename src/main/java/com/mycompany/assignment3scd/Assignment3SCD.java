@@ -5,22 +5,18 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 class Library{
-
     //creating default table model
     DefaultTableModel m1=new DefaultTableModel();
     void loadData() throws FileNotFoundException
@@ -96,7 +92,33 @@ class Library{
         // set the custom cell renderer for the 3rd column
         TableColumn column = table.getColumnModel().getColumn(3);
         column.setCellRenderer(new ButtonCellRenderer(new JButton("Read Item")));
-      
+        //enable mouse hovering
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0 ) {
+                    table.setSelectionBackground(Color.LIGHT_GRAY);
+                    table.setSelectionForeground(Color.BLACK);
+                    table.setRowSelectionInterval(row, row);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    table.setSelectionBackground(Color.LIGHT_GRAY);
+                    table.setSelectionForeground(Color.BLACK);
+                    table.setRowSelectionInterval(row, row);
+                }
+            }
+            //sets the table background color to default color
+            @Override
+            public void mouseExited(MouseEvent e) {
+                table.setSelectionBackground(table.getBackground());
+            }
+        });
         //setting visibility equal to true
         frame.setVisible(true);
     }
