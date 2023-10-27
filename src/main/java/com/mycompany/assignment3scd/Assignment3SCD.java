@@ -5,10 +5,15 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +53,14 @@ class Library{
             {
                 addBook();
             }
+        });
+        //make deleteitem button functional
+        deleteItem.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteBook();
+            }
+            
         });
         
         buttonsPanel.add(editItem);
@@ -95,7 +108,7 @@ class Library{
         JTextField title=new JTextField();
         JTextField author=new JTextField();
         JTextField yearofPublication=new JTextField();
-        //add the read book button
+        //add the add book button
         JButton addButton=new JButton("Add Book");
         //add all these things in the dialog box
         addBookDialog.add(new JLabel("Enter the title of the book: "));
@@ -152,11 +165,86 @@ class Library{
         //set visibility of the dialog box
         addBookDialog.setVisible(true);
     }
+    //delete book function
+    private void deleteBook()
+    {
+        //separate gui screen
+        JDialog deleteBookDialog=new JDialog(); 
+        //title of gui screen
+        deleteBookDialog.setTitle("Delete Book");
+        //set size of dialog box
+        deleteBookDialog.setSize(500,100);
+        //setting the layout as grid layout
+        deleteBookDialog.setLayout(new GridLayout(2,2));
+        //make text boxes/fields
+        JTextField title=new JTextField();
+        //add the delete book button
+        JButton deleteButton=new JButton("Delete Book");
+        deleteBookDialog.add(new JLabel("Enter the title of the book: "));
+        deleteBookDialog.add(title);
+        //first add empty cell 
+        deleteBookDialog.add(new JLabel(""));
+        deleteBookDialog.add(deleteButton);
+        deleteButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+            String EnteredTitle=title.getText();
+            //remove entry from the JTable
+                for (int i=0;i<m1.getRowCount();i++)
+                {
+                   String name=(String)m1.getValueAt(i, 0);
+                   //if book is in table
+                   if(name.equals(EnteredTitle))
+                   {
+                       m1.removeRow(i);
+                       showDeleteSuccessMessage();
+                       //remove row from file
+                        try{
+                            //dont append the data just write the data from the table
+                            FileWriter fw=new FileWriter("data.txt",false);
+                            for(int x=0;x<m1.getRowCount();x++)
+                            {
+                                for(int y=0;y<m1.getColumnCount();y++)
+                                {
+                                    if(y!=3)
+                                    {
+                                    //read each cell
+                                    Object entry=m1.getValueAt(x, y);
+                                    if(entry!=null)
+                                    {
+                                        fw.write(entry.toString());
+                                    }
+                                    if(y<m1.getColumnCount()-2)
+                                    {
+                                        fw.write(",");
+                                    }
+                                    }
+
+                                }
+                                fw.write("\n");
+                            }
+                            fw.close();
+                        }
+                        catch(IOException ex)
+                        {
+                        }
+                       return;
+                   }
+                }
+                showbookNotFoundMessage();
+            }
+        });
+        deleteBookDialog.setVisible(true);
+        
+    }
+   
+    
     //saving data to the text file
     private void saveToTextFile(String title, String author,String year) throws IOException
     {
         try(FileWriter filewriter=new FileWriter("data.txt",true)){
-            String data="\n"+title+","+author+","+year+"\n";
+            String data="\n"+title+","+author+","+year;
         filewriter.write(data);
         showSuccessMessage();
         }
@@ -167,6 +255,14 @@ class Library{
     private void showSuccessMessage()
     {
         JOptionPane.showMessageDialog(null, "Data added successfully !");
+    }
+    private void showbookNotFoundMessage()
+    {
+        JOptionPane.showMessageDialog(null, " Book not found in the Library !");
+    }
+    private void showDeleteSuccessMessage()
+    {
+        JOptionPane.showMessageDialog(null, "Book deleted successfully !");
     }
     private void showErrorMessage()
     {
