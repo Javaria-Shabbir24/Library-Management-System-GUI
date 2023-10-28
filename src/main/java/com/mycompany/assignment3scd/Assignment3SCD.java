@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -17,8 +19,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
+
+
 class BarChart extends JPanel
 {
     private Map<String,Integer>data;
@@ -87,7 +90,9 @@ class BarChart extends JPanel
         }
     }
 }
+
 class Library{
+    Map<Integer,String>rowTextMap=new HashMap<>();
     //creating default table model
     DefaultTableModel m1=new DefaultTableModel();
     void loadData() throws FileNotFoundException
@@ -170,6 +175,7 @@ class Library{
         Scanner read= new Scanner(file);
         read.useDelimiter(",");
         int rowIndex=0;
+        String datax=null;
         while(read.hasNextLine())//Till the last line
         {
           String line=read.nextLine();//line by line 
@@ -177,37 +183,45 @@ class Library{
           if(value.length==3)
           {
               m1.addRow(new Object[]{value[0],value[1],value[2],"Read Item"});
+              //setting the book content
+              if(m1.getValueAt(rowIndex, 0).equals("Harry Potter"))
+              {
+               datax="The story revolves around a young orphan named Harry Potter, who discovers on his eleventh birthday that he is a wizard and has been accepted to attend Hogwarts School of Witchcraft and Wizardry. At Hogwarts, Harry makes friends and learns about the magical world, its history, and its mysteries."  ;
+              }
+              else if(m1.getValueAt(rowIndex, 0).equals("Cinderella"))
+              {
+                datax="The tale revolves around a kind and gentle young woman named Cinderella, who is mistreated and abused by her wicked stepmother and stepsisters. Despite her hardships, Cinderella remains resilient and kind. With the help of her magical fairy godmother, she is transformed from a poor, ragged servant into a beautiful princess dressed in a stunning gown, glass slippers, and a pumpkin carriage.";
+              }
+              else if(m1.getValueAt(rowIndex, 0).equals("Stuart Little"))
+              {
+                  datax="Despite his diminutive size, Stuart is embraced as a member of the Little family, alongside his human parents and older brother, George. He embarks on various adventures and navigates the challenges of living in a world designed for humans, such as driving a tiny car and interacting with animals who are both friends and foes.";
+              }
+              else
+              {
+                  datax=null;
+              }
+              rowTextMap.put(rowIndex, datax);
           }
           rowIndex++;
         }
-        // set the custom cell renderer for the 3rd column
-        TableColumn column = table.getColumnModel().getColumn(3);
-        column.setCellRenderer(new ButtonCellRenderer(new JButton("Read Item")));
+         table.getColumnModel().getColumn(3).setCellRenderer(new RenderButtonForTable());
+         table.getColumnModel().getColumn(3).setCellEditor(new ButtonEditorForTable(new JTextField(),table,m1,rowTextMap));
+         
+           
+        
         //enable mouse hovering
-        table.addMouseListener(new MouseAdapter() {
+        table.addMouseMotionListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseMoved(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0 ) {
+                    table.getSelectionModel().setSelectionInterval(row, row);
                     table.setSelectionBackground(Color.LIGHT_GRAY);
-                    table.setSelectionForeground(Color.BLACK);
-                    table.setRowSelectionInterval(row, row);
                 }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                if (row >= 0) {
-                    table.setSelectionBackground(Color.LIGHT_GRAY);
-                    table.setSelectionForeground(Color.BLACK);
-                    table.setRowSelectionInterval(row, row);
+                else
+                {
+                    table.getSelectionModel().clearSelection();
                 }
-            }
-            //sets the table background color to default color
-            @Override
-            public void mouseExited(MouseEvent e) {
-                table.setSelectionBackground(table.getBackground());
             }
         });
         //setting visibility equal to true
@@ -242,9 +256,9 @@ class Library{
         //setting the layout as grid layout
         addBookDialog.setLayout(new GridLayout(4,2));
         //make text boxes/fields
-        JTextField title=new JTextField();
-        JTextField author=new JTextField();
-        JTextField yearofPublication=new JTextField();
+        JTextField title=new JTextField(10);
+        JTextField author=new JTextField(10);
+        JTextField yearofPublication=new JTextField(10);
         //add the add book button
         JButton addButton=new JButton("Add Book");
         //add all these things in the dialog box
@@ -315,7 +329,7 @@ class Library{
         //setting the layout as grid layout
         editBookDialog.setLayout(new GridLayout(2,2));
         //make text boxes/fields
-        JTextField title=new JTextField();
+        JTextField title=new JTextField(10);
         //add the delete book button
         JButton editButton=new JButton("Edit Book");
         editBookDialog.add(new JLabel("Enter the title of the book you want to edit: "));
@@ -361,7 +375,7 @@ class Library{
                                     //setting the layout as grid layout
                                     editBookNameDialog.setLayout(new GridLayout(2,2));
                                     //make text boxes/fields
-                                    JTextField title=new JTextField();
+                                    JTextField title=new JTextField(10);
                                     //add the delete book button
                                     JButton editButton=new JButton("Done");
                                     editBookNameDialog.add(new JLabel("Enter new title: "));
@@ -403,7 +417,7 @@ class Library{
                                     //setting the layout as grid layout
                                     editAuthorNameDialog.setLayout(new GridLayout(2,2));
                                     //make text boxes/fields
-                                    JTextField author=new JTextField();
+                                    JTextField author=new JTextField(10);
                                     //add the delete book button
                                     JButton editAuthorButton=new JButton("Done");
                                     editAuthorNameDialog.add(new JLabel("Enter new author name: "));
@@ -446,7 +460,7 @@ class Library{
                                     //setting the layout as grid layout
                                     editYearDialog.setLayout(new GridLayout(2,2));
                                     //make text boxes/fields
-                                    JTextField year=new JTextField();
+                                    JTextField year=new JTextField(10);
                                     //add the delete book button
                                     JButton editYearButton=new JButton("Done");
                                     editYearDialog.add(new JLabel("Enter new year of publication: "));
@@ -560,11 +574,11 @@ class Library{
         //title of gui screen
         deleteBookDialog.setTitle("Delete Book");
         //set size of dialog box
-        deleteBookDialog.setSize(800,700);
+        deleteBookDialog.setSize(500,100);
         //setting the layout as grid layout
         deleteBookDialog.setLayout(new GridLayout(2,2));
         //make text boxes/fields
-        JTextField title=new JTextField();
+        JTextField title=new JTextField(10);
         //add the delete book button
         JButton deleteButton=new JButton("Delete Book");
         deleteBookDialog.add(new JLabel("Enter the title of the book: "));
@@ -666,16 +680,117 @@ class InvalidInputException extends Exception {
         super(message);
     }
 }
- class ButtonCellRenderer extends DefaultTableCellRenderer {
-    private final JButton button;
-    public ButtonCellRenderer(JButton button) {
-        this.button = button;
+
+class RenderButtonForTable extends JButton implements TableCellRenderer
+{
+    public RenderButtonForTable()
+    {
+        setOpaque(true);
     }
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        return button;
+        setText("Read Item");
+        return this;
     }
 }
+
+class ButtonEditorForTable extends DefaultCellEditor 
+{
+    private final JButton button;
+    private String label;
+    private boolean isPushed;
+
+    public ButtonEditorForTable(JTextField textField,JTable table,DefaultTableModel m1, Map<Integer,String>rowTextMap) 
+    {
+        super(textField);
+        button = new JButton();
+        button.setOpaque(true);
+        button.addActionListener((ActionEvent e) -> 
+        {
+            
+//separate gui screen
+        JDialog ReadItem=new JDialog(); 
+        //title of gui screen
+        ReadItem.setTitle("Book Details");
+        //set size of dialog box
+        ReadItem.setSize(800,700);
+        //select the row
+        int selectedrow=table.getSelectedRow();
+        if(selectedrow>=0)
+        {
+           this.label=rowTextMap.get(selectedrow);
+           if(label!=null)
+                {
+                JTextArea contentArea=new JTextArea(label);
+                ReadItem.add(new JScrollPane(contentArea));
+                ReadItem.setSize(400,300);
+                ReadItem.setVisible(true);
+                }
+           else
+                {
+                    JTextArea contentArea=new JTextArea("No content added");
+                    ReadItem.add(new JScrollPane(contentArea));
+                    ReadItem.setSize(400,300);
+                    ReadItem.setVisible(true);
+                }
+           
+            //add window listener frame
+            ReadItem.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    int option = JOptionPane.showConfirmDialog(ReadItem, "Do you really want to exit?", "Confirm Exit", JOptionPane.YES_NO_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        ReadItem.dispose(); // Close the dialog
+                    }
+                    else if( option==JOptionPane.NO_OPTION)
+                    {
+                        
+                    }
+                }
+            });
+
+        }
+            
+        });
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        if (isSelected) 
+        {
+            button.setForeground(table.getSelectionForeground());
+            button.setBackground(table.getSelectionBackground());
+        } else
+        {
+            button.setForeground(table.getForeground());
+            button.setBackground(table.getBackground());
+        }
+        label = (value == null) ? "" : value.toString();
+        button.setText(label);
+        isPushed = true;
+        return button;
+    }
+
+    @Override
+    public Object getCellEditorValue()
+    {
+        if (isPushed) 
+        {
+
+        }
+        isPushed = false;
+        return label;
+    }
+
+    @Override
+    public boolean stopCellEditing()
+    {
+        isPushed = false;
+        return super.stopCellEditing();
+    }
+}
+
 public class Assignment3SCD {
 
     public static void main(String[] args) throws FileNotFoundException {
