@@ -34,3 +34,7 @@ The system stores book data in a text file named "data.txt".
 - **editBook():** This method enables editing existing book details. It allows searching for a book by title and then modifying specific details (title, author, year) in separate dialogs.
 - **deleteBook():** This method facilitates deleting books from the system. It prompts the user for the book title and removes it from the table and the text file upon confirmation.
 - **saveToTextFile():** This method helps save newly added book data to the "data.txt" file.
+
+## Collaborations
+
+Collaborations are highly appreciated! 
